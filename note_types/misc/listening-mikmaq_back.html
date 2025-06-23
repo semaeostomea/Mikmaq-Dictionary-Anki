@@ -1,0 +1,132 @@
+{{FrontSide}}
+
+<main id=Answer>
+    <span class="info">{{English}}</span>
+    <span class="info secondary">{{POS}}</span>
+</main>
+
+<script>
+    (() => {
+
+        let valid = false;
+
+        function add_additiona_translations() {
+            let translations = {{WithListening}};
+            let transContainer = document.getElementById("Answer")
+            if (translations.length > 0) {
+                let first = transContainer.querySelector("span.info:first-child");
+                first.innerText = `• ${first.innerText}`;
+            }
+            for (let trans of translations) {
+                let elemEng = document.createElement("span");
+                elemEng.className = "info";
+                elemEng.innerText = `• ${trans[0]}`;
+                transContainer.appendChild(elemEng);
+
+                let elemPos = document.createElement("span");
+                elemPos.className = "info secondary";
+                elemPos.innerText = trans[1];
+                transContainer.appendChild(elemPos);
+            };
+        };
+
+        function resultAudio(valid) {
+            let audio = document.createElement("audio");
+            if (valid) {
+                audio.src = "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg";
+            } else {
+                audio.src = "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg";
+            };
+            audio.volume = 0.4;
+            return audio
+        };
+
+        async function playResultAudio() {
+            //////// audio to confirm valid answer ////////
+            try {
+                let audio = resultAudio(valid);
+                await audio.play();
+            } catch {};
+        };
+
+        function checkInput() {
+
+            let firstBadChar = document.querySelectorAll("code#typeans>.typeBad:first-child, code#typeans>br+.typeMissed");
+            if (firstBadChar.length == 2) {
+                if (firstBadChar[0].textContent.toLowerCase() == firstBadChar[1].textContent.toLowerCase()) {
+                    firstBadChar[0].className = "typeGood";
+                    firstBadChar[1].className = "typeGood";
+                };
+            };
+
+            let lastBadChar = document.querySelectorAll("code#typeans>.typeBad:has(+br), code#typeans>.typeMissed:has(+br), code#typeans>.typeMissed:last-child");
+
+            if (lastBadChar.length == 2) {
+                if (
+                    ["?", "!", "."].includes(lastBadChar[1].textContent)
+                    && (
+                        ["?", "!", "."].includes(lastBadChar[0].textContent)
+                        || lastBadChar[0].className == "typeMissed"
+                        )
+                ) {
+                    lastBadChar[0].className = "typeGood";
+                    lastBadChar[1].className = "typeGood";
+                };  
+            }
+
+            let correct = document.querySelector("code#typeans:not(:has(>.typeMissed, >.typeBad)):has(.typeGood)");
+            let solution = document.querySelector("#solution.hidefront");
+            if (correct) {
+                solution.classList.add("correct");
+                correct.remove();
+                valid = true;
+            };
+
+            let typeElement = document.getElementById("typeans")
+            if (typeElement.children.length == 0) {
+                typeElement.remove();
+                return
+            };
+
+            solution.remove();
+
+            let newTypeElement = document.createElement("span");
+            newTypeElement.id = "solution";
+            let deleteSwitch = false;
+            let toDelete = Array();
+            for (let child of typeElement.children) {
+                if (child.tagName.toLowerCase() == "br") {
+                    deleteSwitch = true;
+                };
+                if (deleteSwitch == true) {
+                    if (child.className.startsWith("type")) {
+                        let newChild = child.cloneNode(true);
+                        newChild.className = newChild.className.replace("type", "");
+                        newTypeElement.appendChild(newChild);
+                    };
+                    toDelete.push(child);
+                };
+            };
+            for (let x of toDelete) {
+                typeElement.removeChild(x);
+            };
+            typeElement.parentElement.style = "";
+            typeElement.parentElement.appendChild(newTypeElement);
+        };
+
+        async function initialize() {
+            checkInput();
+            {{#WithListening}}
+                add_additiona_translations();
+            {{/WithListening}}
+        };
+
+        if (onUpdateHook !== undefined) {
+            onUpdateHook.push(initialize);
+        }
+
+        if (onShownHook !== undefined) {
+            // onShownHook.push(playResultAudio);
+        }
+    })();
+</script>

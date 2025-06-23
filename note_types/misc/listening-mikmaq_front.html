@@ -1,0 +1,147 @@
+{{#MikmaqAudio}}
+    {{#WithListening}}
+        <header>
+            {{#SourceLink}}
+                <a href={{SourceLink}}>Mi'kmaq Online Dictionary</a>
+            {{/SourceLink}}
+        </header>
+
+        <main>
+            <section id=Prompt class="main">
+                <div class="playButton" onclick="this.nextElementSibling.play();">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z"/></svg>
+                </div>
+                <audio src="{{MikmaqAudio}}"></audio>
+                <label class="info">Type what you hear:</label>
+                {{type:Mikmaq}}
+                <textarea id="textInput" placeholder="Mi'kmaq" class="hideback" autofocus rows=1 onInput="textAreaOnInput(this);" onkeypress="_typeAnsPress();"></textarea>
+                <div class="inputContainer hideback hidefront"></div>
+                {{#AltButtons}}
+                    <button id="wordBankToggle" class="hideback" onclick="toggleWordBank();">Use word bank</button>
+                {{/AltButtons}}
+                <span id=solution class=hidefront>{{Mikmaq}}</span>
+                <div id="selection" class="hideback hidefront"></div>
+            </section>
+        </main>
+
+        <script>
+
+            function toggleWordBank() {
+                let wordBankToggle = document.getElementById("wordBankToggle");
+                let inputContainer = document.querySelector(".inputContainer");
+                let wordBankButtons = document.getElementById("selection");
+                let inputTextarea = document.getElementById("textInput");
+                let infoLabel = wordBankToggle.parentElement.querySelector("label.info");
+
+                if (inputContainer.classList.contains("hidefront")) {
+                    inputContainer.classList.remove("hidefront");
+                    wordBankButtons.classList.remove("hidefront");
+                    inputTextarea.classList.add("hidefront");
+                    wordBankToggle.innerText = "Use text input";
+                    infoLabel.innerText = "Select what you hear:"
+                } else {
+                    inputContainer.classList.add("hidefront");
+                    wordBankButtons.classList.add("hidefront");
+                    inputTextarea.classList.remove("hidefront");
+                    wordBankToggle.innerText = "Use word bank";
+                    infoLabel.innerText = "Type what you hear:"
+                };
+            };
+
+            function onButtonClick(event) {
+                let buttonInput = document.querySelector(".inputContainer");
+                let buttonSelect = document.querySelector("#selection");
+                if (this.parentElement == buttonInput) {
+                    buttonSelect.appendChild(this);
+                } else {
+                    buttonInput.appendChild(this);
+                };
+
+                let realInput = document.querySelector("input#typeans");
+                let input = new Array();
+                for (let child of buttonInput.children) {
+                    input.push(child.textContent);
+                };
+                realInput.value = input.join(" ");
+            };
+
+            function textAreaOnInput(element) {
+                if (element.value.endsWith("\n")) {
+                    return
+                };
+                let realInput = document.querySelector("input#typeans");
+                realInput.value = element.value;
+                element.style.height = "1px";
+                element.style.padding = 0;
+                element.style.height = `${element.scrollHeight}px`;
+                element.style.padding = "var(--df-input-padding)";
+            };
+
+            (() => {
+
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
+
+                function addButtons() {
+                    let container = document.getElementById("selection");
+                    let words = "{{Mikmaq}}".toLowerCase().replace(/\.$/, "").split(" ");
+                    let altButtons = {{AltButtons}}
+                    shuffleArray(altButtons);
+                    altButtons.splice(0, 15);
+                    words.push(...altButtons);
+                    shuffleArray(words);
+                    for (let word of words) {
+                        let button = document.createElement("button");
+                        button.innerText = word;
+                        button.onclick = onButtonClick;
+                        container.appendChild(button);
+                    };
+                };
+
+                async function playFirstAudio() {
+
+                    let firstAudio = document.querySelector("#SilentAudio .soundLink, #SilentAudio .replaybutton");
+
+                    let prompt = document.querySelector("#Prompt>audio");
+
+                    let answer = document.querySelector("#Answer>audio");
+
+                    if (prompt) {
+                        if (!document.getElementById('Answer')) {
+                            firstAudio = prompt
+                        };
+                    };
+
+                    if (answer) { 
+                        firstAudio = answer;
+                    };
+
+                    if (firstAudio) {
+                        await firstAudio.play();
+                    }
+                };
+
+                async function initialize() {
+                    {{#AltButtons}}
+                        addButtons();
+                    {{/AltButtons}}
+                };
+
+                if (onUpdateHook !== undefined) {
+                    if (!document.querySelector("#Answer")) {
+                        onUpdateHook.push(initialize);
+                    };
+                };
+                
+                if (onShownHook !== undefined) {
+                    onShownHook.push(playFirstAudio);
+                }
+
+            })();
+        </script>
+    {{/WithListening}}
+{{/MikmaqAudio}}

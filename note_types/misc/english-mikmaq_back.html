@@ -1,0 +1,90 @@
+{{FrontSide}}
+
+<main id=Answer>
+    <span class="info secondary">{{PronunciationGuide}}</span>
+    {{#MikmaqAudio}}
+        <div class="playButton" onclick="this.nextElementSibling.play();">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z"/></svg>
+        </div>
+        <audio src="{{MikmaqAudio}}"></audio>
+    {{/MikmaqAudio}}
+</main>
+
+<script>
+    (() => {
+
+        let valid = false;
+
+        function resultAudio(valid) {
+            let audio = document.createElement("audio");
+            if (valid) {
+                audio.src = "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg";
+            } else {
+                audio.src = "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg";
+            };
+            audio.volume = 0.4;
+            return audio
+        };
+
+        async function playResultAudio() {
+            //////// audio to confirm valid answer ////////
+            try {
+                let audio = resultAudio(valid);
+                await audio.play();
+            } catch {};
+        };
+
+        function checkInput() {
+            let correct = document.querySelector("code#typeans:not(:has(>.typeMissed, >.typeBad))>.typeGood");
+            let solution = document.querySelector("#solution.hidefront");
+            if (correct) {
+                solution.classList.add("correct");
+                correct.remove();
+                valid = true;
+            };
+
+            let typeElement = document.getElementById("typeans")
+            if (typeElement.children.length == 0) {
+                typeElement.remove();
+                return
+            };
+
+            solution.remove();
+
+            let newTypeElement = document.createElement("span");
+            newTypeElement.id = "solution";
+            let deleteSwitch = false;
+            let toDelete = Array()
+            for (let child of typeElement.children) {
+                if (child.tagName.toLowerCase() == "br") {
+                    deleteSwitch = true;
+                };
+                if (deleteSwitch == true) {
+                    if (child.className.startsWith("type")) {
+                        let newChild = child.cloneNode(true);
+                        newChild.className = newChild.className.replace("type", "");
+                        newTypeElement.appendChild(newChild);
+                    };
+                    toDelete.push(child);
+                };
+            };
+            for (let x of toDelete) {
+                typeElement.removeChild(x);
+            };
+            typeElement.parentElement.style = "";
+            typeElement.parentElement.appendChild(newTypeElement);
+        };
+
+        async function initialize() {
+            checkInput();
+        };
+
+        if (onUpdateHook !== undefined) {
+            onUpdateHook.push(initialize);
+        }
+
+        if (onShownHook !== undefined) {
+            // onShownHook.push(playResultAudio);
+        }
+    })();
+</script>

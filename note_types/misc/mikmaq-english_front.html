@@ -1,0 +1,86 @@
+{{#WithFromMikmaq}}
+<header>
+    {{#SourceLink}}
+        <a href={{SourceLink}}>Mi'kmaq Online Dictionary</a>
+    {{/SourceLink}}
+</header>
+
+<main>
+    <section id=Prompt>
+        {{#MikmaqAudio}}
+            <div class="playButton" onclick="this.nextElementSibling.play();">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z"/></svg>
+            </div>
+            <audio src="{{MikmaqAudio}}"></audio>
+        {{/MikmaqAudio}}
+        <span>{{Mikmaq}}</span>
+        <span class="info">{{PronunciationGuide}}</span>
+        {{type:English}}
+        <textarea id="textInput" placeholder="English" class="hideback" autofocus rows=1 onInput="textAreaOnInput(this);" onkeypress="_typeAnsPress();"></textarea>
+        <span id=solution class=hidefront>{{English}}</span>
+    </section>
+</main>
+
+<script>
+
+    function textAreaOnInput(element) {
+        if (element.value.endsWith("\n")) {
+            return
+        };
+        let realInput = document.querySelector("input#typeans");
+        realInput.value = element.value;
+        element.style.height = "1px";
+        element.style.padding = 0;
+        element.style.height = `${element.scrollHeight}px`;
+        element.style.padding = "var(--df-input-padding)";
+    };
+
+	(() => {
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        async function playFirstAudio() {
+
+            let firstAudio = document.querySelector("#SilentAudio .soundLink, #SilentAudio .replaybutton");
+
+            let prompt = document.querySelector("#Prompt>audio");
+
+            let answer = document.querySelector("#Answer>audio");
+
+            if (prompt) {
+                if (!document.getElementById('Answer')) {
+                    firstAudio = prompt
+                };
+            };
+
+            if (answer) { 
+                firstAudio = answer;
+            };
+
+            if (firstAudio) {
+                await firstAudio.play();
+            }
+        };
+
+        async function initialize() {
+
+        };
+
+        if (onUpdateHook !== undefined) {
+            if (!document.querySelector("#Answer")) {
+                onUpdateHook.push(initialize);
+            };
+        };
+        
+        if (onShownHook !== undefined) {
+            onShownHook.push(playFirstAudio);
+        }
+
+    })();
+</script>
+{{/WithFromMikmaq}}

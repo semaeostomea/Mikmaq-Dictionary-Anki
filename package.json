@@ -1,0 +1,7 @@
+{
+    "name": "compile-mikmaq-dict",
+    "license": "EUPL-1.2",
+    "dependencies": {
+        "jsdom": "^26.1.0"
+    }
+}

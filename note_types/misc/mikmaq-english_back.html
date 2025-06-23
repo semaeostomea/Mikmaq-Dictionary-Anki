@@ -1,0 +1,84 @@
+{{FrontSide}}
+
+<main id=Answer>
+    <span class="info secondary">{{POS}}</span>
+</main>
+
+<script>
+    (() => {
+
+        let valid = false;
+
+        function resultAudio(valid) {
+            let audio = document.createElement("audio");
+            if (valid) {
+                audio.src = "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg";
+            } else {
+                audio.src = "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg";
+            };
+            audio.volume = 0.4;
+            return audio
+        };
+
+        async function playResultAudio() {
+            //////// audio to confirm valid answer ////////
+            try {
+                let audio = resultAudio(valid);
+                await audio.play();
+            } catch {};
+        };
+
+        function checkInput() {
+            let correct = document.querySelector("code#typeans:not(:has(>.typeMissed, >.typeBad))>.typeGood");
+            let solution = document.querySelector("#solution.hidefront");
+            if (correct) {
+                solution.classList.add("correct");
+                correct.remove();
+                valid = true;
+            };
+
+            let typeElement = document.getElementById("typeans")
+            if (typeElement.children.length == 0) {
+                typeElement.remove();
+                return
+            };
+
+            solution.remove();
+
+            let newTypeElement = document.createElement("span");
+            newTypeElement.id = "solution";
+            let deleteSwitch = false;
+            let toDelete = Array()
+            for (let child of typeElement.children) {
+                if (child.tagName.toLowerCase() == "br") {
+                    deleteSwitch = true;
+                };
+                if (deleteSwitch == true) {
+                    if (child.className.startsWith("type")) {
+                        let newChild = child.cloneNode(true);
+                        newChild.className = newChild.className.replace("type", "");
+                        newTypeElement.appendChild(newChild);
+                    };
+                    toDelete.push(child);
+                };
+            };
+            for (let x of toDelete) {
+                typeElement.removeChild(x);
+            };
+            typeElement.parentElement.style = "";
+            typeElement.parentElement.appendChild(newTypeElement);
+        };
+
+        async function initialize() {
+            checkInput();
+        };
+
+        if (onUpdateHook !== undefined) {
+            onUpdateHook.push(initialize);
+        }
+
+        if (onShownHook !== undefined) {
+            // onShownHook.push(playResultAudio);
+        }
+    })();
+</script>
