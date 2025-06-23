@@ -49,7 +49,7 @@ try:
             self._load_templates()
 
         def _load_templates(self):
-            for root, subdirs, files in os.walk("note_types"):
+            for root, subdirs, files in os.walk("files/note_types"):
                 for file in files:
                     path = f"{root.replace('\\', '/')}/{file}"
                     key = file.split(".")[0]
