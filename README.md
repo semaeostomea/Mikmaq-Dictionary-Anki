@@ -7,6 +7,7 @@ The generated files are updated regularly, this includes the Anki deck [`Mikmaq.
 You'll need [node.js](https://nodejs.org/) to generate dictionary data, and [python](https://www.python.org/) to generate the Anki deck. Module/package requirements are found in [`package.json`](./package.json) and [`requirements.txt`](./requirements.txt) respectively.
 
 ### Anki deck
+#### You can also find the deck on [AnkiWeb](https://ankiweb.net/shared/info/1341925420)
 The deck does not include any local audio files — instead, it loads the audio files directly from the online dictionary. This keeps the file size small and sync/loading times short, but limits offline-usage.<br>
 There are also known issues with alternative grammar forms not being formatted correctly — due to inconsistent formatting on the website. These grammar forms are only included as additional info in one card type.
 #### Generating
